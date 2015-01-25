@@ -1,2 +1,4 @@
 This application converts equations witten in latex to images.
 Latex and ImageMagick have to be installed in your computer.
+
+This application is beeing developed with Qt GPL.
