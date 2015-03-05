@@ -1,4 +1,47 @@
-This application converts equations witten in latex to images.
-Latex and ImageMagick have to be installed in your computer.
+The author of this application do NOT have any responsibility 
+to the result of your using this application.
+
+<Abstract>
+
+ This application converts equations witten in latex to images.
+The default image formats are eps and png.
+Latex enviornment has to be installed in your computer.
+If you want other image formats (jpeg and tif is now supported), 
+you need to install imagemagick (and, if not installed, ghostScript).
+
+
+<License>
 
 This application is beeing developed with Qt GPL.
+
+<Requirements>
+
+-Latex enviornmet in your computer
+
+
+<How to use?>
+
+*At the 1st use
+
+ At the 1st time you use, the paths to Latex and Dvips have to be specified.
+You can find the 'path' tag on the top of the main-window.
+Open 'path'->'platex' then specify the directory where your 'latex' is located.
+As same manner, specify the location of 'divps'.
+If you want to use imagemagick, specify the location of 'convert' of imagemagick.
+
+*After you finish path configuration
+
+ Once you finish the path configuration,
+the only what you have to do is type your equation with tex in the editing area.
+Preveiw is automatically prepeared 5 seconds after your last input.
+You can force the preview by input enter or click 'preview' button.
+After you finish your equation, you can save the image and original text by clicking 'convert' button.
+Do not forget to specify the name of equation, otherwise they will be saved with default name, 'file-name'.
+The image size can be changed by changing the value of 'size' spin-box.
+You can import packages such as 'bm' or your original macro files.
+Open 'file'->'import' then enter your favorite package name in the 'package' area in one package name per line.
+Extention (.sty) is not needed.
+If you want to use your original macros, enter the tex file which defines your macros.
+Extention (.tex) is required.
+Please notice that our macro files have to be located 
+in the same directory with the executable of this application.
