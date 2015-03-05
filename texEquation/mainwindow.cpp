@@ -25,7 +25,8 @@ MainWindow::MainWindow(QWidget *parent) :
     iniFileKeyPathDvips("pathDvips"),
     iniFileKeyPathImageMagick("pathImageMagick"),
     iniFileKeyPackageList("packageList"),
-    iniFileKeyIncludeList("includeList")
+    iniFileKeyIncludeList("includeList"),
+    iniFileKeyLastSaveDir("lastSaveDir")
 {
     ui->setupUi(this);
     ui->graphicsViewPreview->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -136,10 +137,17 @@ finish:
     ui->graphicsViewPreview->setUpdatesEnabled(true);
 }
 
-void MainWindow::selectDirectory()
+bool MainWindow::selectDirectory()
 {
-    savePath = QFileDialog::getExistingDirectory(this, tr("Select Directory"));
-    savePath.push_back('/');
+    QString buf = QFileDialog::getExistingDirectory(this, tr("Select Directory"), this->savePath);
+
+    if(buf == "") {
+        return false;
+    } else {
+        buf.push_back('/');
+        savePath = buf;
+        return true;
+    }
 }
 
 void MainWindow::loadIniFile()
@@ -156,6 +164,7 @@ void MainWindow::loadIniFile()
         if(keyAndValue[0] == this->iniFileKeyPathImageMagick) this->conv->subscribePathImageMagick(keyAndValue[1]);//this->pathImageMagick = keyAndValue[1];
         if(keyAndValue[0] == this->iniFileKeyPackageList) this->packageList->push_back(keyAndValue[1]);
         if(keyAndValue[0] == this->iniFileKeyIncludeList) this->includeList->push_back(keyAndValue[1]);
+        if(keyAndValue[0] == this->iniFileKeyLastSaveDir) this->savePath = keyAndValue[1];
     }
     iniFile.close();
 }
@@ -168,6 +177,7 @@ void MainWindow::writeIniFile()
     out << this->iniFileKeyPathPlatex << '=' << this->conv->getPathPlatex() << endl;
     out << this->iniFileKeyPathDvips  << '=' << this->conv->getPathDvips()  << endl;
     out << this->iniFileKeyPathImageMagick << '=' << this->conv->getPathImageMagick() << endl;
+    out << this->iniFileKeyLastSaveDir << '=' << this->savePath << endl;
     for(int i = 0; i < this->packageList->size(); i++){
         out << this->iniFileKeyPackageList << '=' << this->packageList->at(i) << endl;
     }
@@ -186,8 +196,33 @@ void MainWindow::saveText()
     outFile.close();
 }
 
+bool MainWindow::checkIfExist(const QString &fileName)
+{
+    if(QFile::exists(tr("%1%2.txt")
+                    .arg(this->savePath)
+                    .arg(fileName)))
+    {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 void MainWindow::on_pushButtonConvert_clicked()
 {
+    if (!selectDirectory()) return;
+
+    if(checkIfExist(ui->lineEditName->text())) {
+        int ret = QMessageBox::warning(this, tr("warning"),
+                              tr("specified file already exist. OK to overwrite?"),
+                              QMessageBox::Ok | QMessageBox::Cancel,
+                              QMessageBox::Cancel);
+
+        if (ret != QMessageBox::Ok) return;
+    }
+
+    saveText();
+
     bool ret = conv->setup(ui->plainTextEditEq->toPlainText(),
                   ui->spinBoxMagnitude->value(),
                   ui->comboBoxFont->currentIndex(),
@@ -208,10 +243,12 @@ void MainWindow::on_pushButtonPreview_clicked()
     createPreview();
 }
 
+/*
 void MainWindow::on_actionSelect_directory_2_triggered()
 {
     selectDirectory();
 }
+*/
 
 void MainWindow::on_actionLoad_triggered()
 {
@@ -280,10 +317,12 @@ void MainWindow::on_actionImport_2_triggered()
     impForm = 0;
 }
 
+/*
 void MainWindow::on_actionSave_text_triggered()
 {
     saveText();
 }
+*/
 
 void MainWindow::on_comboBoxFont_currentIndexChanged(const QString &arg1)
 {

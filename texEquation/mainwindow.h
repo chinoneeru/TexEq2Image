@@ -23,7 +23,7 @@ public:
     ~MainWindow();
 
 private slots:
-    void selectDirectory();
+    bool selectDirectory();
     void disableConvert();
     void enableConvert();
     void disablePreview();
@@ -33,13 +33,14 @@ private slots:
     void loadIniFile();
     void writeIniFile();
     void saveText();
+    bool checkIfExist(const QString &fileName);
 
 private slots:
     void on_pushButtonConvert_clicked();
 
     void on_pushButtonPreview_clicked();
 
-    void on_actionSelect_directory_2_triggered();
+    //void on_actionSelect_directory_2_triggered();
 
     void on_actionLoad_triggered();
 
@@ -55,7 +56,7 @@ private slots:
 
     void on_actionImport_2_triggered();
 
-    void on_actionSave_text_triggered();
+    //void on_actionSave_text_triggered();
 
     void on_comboBoxFont_currentIndexChanged(const QString &arg1);
 
@@ -81,6 +82,7 @@ private:
     const QString iniFileKeyPathImageMagick;
     const QString iniFileKeyPackageList;
     const QString iniFileKeyIncludeList;
+    const QString iniFileKeyLastSaveDir;
 };
 
 #endif // MAINWINDOW_H

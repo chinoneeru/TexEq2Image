@@ -21,13 +21,14 @@ converter::converter(QObject *parent, QComboBox *comboBoxFont) :
     texEqSource(""),
     fileName("temp"),
     type("png"),
-    pathPlatex(""), pathDvips(""), pathImageMagick(""),
-    platex(0), dvips(0), imageMagickConvert(0),
+    pathPlatex(""), pathDvips(""), pathDvipng(""), pathImageMagick(""),
+    platex(0), dvips(0), dvipng(0), imageMagickConvert(0),
     conversionSuccessed(false),
     preamble("")
 {
     this->platex = new QProcess(this);
     this->dvips  = new QProcess(this);
+    this->dvipng = new QProcess(this);
     this->imageMagickConvert = new QProcess(this);
 
 
@@ -50,7 +51,11 @@ bool converter::setup(const QString &texEqSource, const int magnitude, const int
 {
     if(this->pathPlatex == "") return false;
     if(this->pathDvips  == "") return false;
-    if(this->pathImageMagick == "") return false;
+    if(this->type == "png") {
+        if(this->pathDvipng == "") return false;
+    } else {
+        if(this->pathImageMagick == "") return false;
+    }
 
     this->texEqSource = texEqSource;
     this->texEqSource.replace('\n', ' ');
@@ -159,12 +164,28 @@ bool converter::createEpsFile()
 
 bool converter::createPngFile()
 {
-    if(!processExecutable(this->imageMagickConvert)) return false;
+    if (this->type == "png") {
 
-    this->imageMagickConvert->start(tr("%1/convert %2.eps %2.%3")
-                              .arg(this->pathImageMagick)
-                              .arg(this->fileName).arg(this->type));
-    return this->imageMagickConvert->waitForFinished(PROCESS_TIMEOUT);
+        if(!processExecutable(this->dvipng)) return false;
+
+        this->dvipng->start(tr("%1/dvipng temp.dvi -T tight -D %2 -bg Transparent -o %3.png")
+                            .arg(this->pathDvipng)
+                            .arg(this->magnitude * 100)
+                            .arg(this->fileName));
+
+        return this->dvipng->waitForFinished(PROCESS_TIMEOUT);
+
+    } else {
+
+        if(!processExecutable(this->imageMagickConvert)) return false;
+
+        this->imageMagickConvert->start(tr("%1/convert %2.eps %2.%3")
+                                  .arg(this->pathImageMagick)
+                                  .arg(this->fileName).arg(this->type));
+
+        return this->imageMagickConvert->waitForFinished(PROCESS_TIMEOUT);
+
+    }
 }
 
 bool converter::processExecutable(QProcess *process)
@@ -184,6 +205,13 @@ void converter::subscribePathPlatex(const QString &pathPlatex)
 void converter::subscribePathDvips(const QString &pathDvips)
 {
     this->pathDvips = pathDvips;
+
+    subscribePathDvipng(pathDvips);
+}
+
+void converter::subscribePathDvipng(const QString &pathDvipng)
+{
+    this->pathDvipng = pathDvipng;
 }
 
 void converter::subscribePathImageMagick(const QString &pathImageMagick)

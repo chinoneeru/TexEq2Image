@@ -242,14 +242,6 @@
     <property name="title">
      <string>file</string>
     </property>
-    <widget class="QMenu" name="menuSave">
-     <property name="title">
-      <string>save</string>
-     </property>
-     <addaction name="actionSelect_directory_2"/>
-     <addaction name="actionSave_text"/>
-    </widget>
-    <addaction name="menuSave"/>
     <addaction name="actionLoad"/>
     <addaction name="actionImport_2"/>
    </widget>
@@ -273,11 +265,6 @@
    </attribute>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
-  <action name="actionSelect_directory_2">
-   <property name="text">
-    <string>select directory</string>
-   </property>
-  </action>
   <action name="actionLoad">
    <property name="text">
     <string>load</string>
@@ -304,11 +291,6 @@
   <action name="actionImport_2">
    <property name="text">
     <string>import</string>
-   </property>
-  </action>
-  <action name="actionSave_text">
-   <property name="text">
-    <string>save text</string>
    </property>
   </action>
  </widget>

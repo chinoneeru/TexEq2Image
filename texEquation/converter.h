@@ -21,6 +21,7 @@ public slots:
     void execute();
     void subscribePathPlatex(const QString &pathPlatex);
     void subscribePathDvips(const QString &pathDvips);
+    void subscribePathDvipng(const QString &pathDvipng);
     void subscribePathImageMagick(const QString &pathImageMagick);
     QString getPathPlatex() const;
     QString getPathDvips() const;
@@ -43,9 +44,10 @@ private:
     QStringList fontList;
     int magnitude, font;
     QString texEqSource, fileName, type;
-    QString pathPlatex, pathDvips, pathImageMagick;
+    QString pathPlatex, pathDvips, pathDvipng, pathImageMagick;
     class QProcess *platex;
     class QProcess *dvips;
+    class QProcess *dvipng;
     class QProcess *imageMagickConvert;
     bool conversionSuccessed;
     QString preamble;
