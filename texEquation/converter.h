@@ -10,12 +10,16 @@ class converter : public QObject {
     Q_OBJECT
 
 public:
+    enum mode {prev, conv};
+
+public:
     converter(QObject *parent = 0, QComboBox *comboBoxFont = 0);
     ~converter();
     bool isSuccessed() { return conversionSuccessed; }
     bool setup(const QString &texEqSource, const int magnitude, const int font,
-                 const QString &fileName, const QString &type,
-               const QStringList &packageList, const QStringList &includeList);
+               const QString &fileName, const QString &type,
+               const QStringList &packageList, const QStringList &includeList,
+               const mode md = conv);
 
 public slots:
     void execute();
@@ -51,6 +55,7 @@ private:
     class QProcess *imageMagickConvert;
     bool conversionSuccessed;
     QString preamble;
+    mode convMode;
 };
 
 #endif // CONVERTER_H

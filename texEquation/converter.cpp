@@ -24,7 +24,8 @@ converter::converter(QObject *parent, QComboBox *comboBoxFont) :
     pathPlatex(""), pathDvips(""), pathDvipng(""), pathImageMagick(""),
     platex(0), dvips(0), dvipng(0), imageMagickConvert(0),
     conversionSuccessed(false),
-    preamble("")
+    preamble(""),
+    convMode(prev)
 {
     this->platex = new QProcess(this);
     this->dvips  = new QProcess(this);
@@ -46,8 +47,9 @@ converter::~converter()
 }
 
 bool converter::setup(const QString &texEqSource, const int magnitude, const int font,
-                    const QString &fileName, const QString &type,
-                      const QStringList &packageList, const QStringList &includeList)
+                      const QString &fileName, const QString &type,
+                      const QStringList &packageList, const QStringList &includeList,
+                      const mode md)
 {
     if(this->pathPlatex == "") return false;
     if(this->pathDvips  == "") return false;
@@ -56,6 +58,8 @@ bool converter::setup(const QString &texEqSource, const int magnitude, const int
     } else {
         if(this->pathImageMagick == "") return false;
     }
+
+    this->convMode = md;
 
     this->texEqSource = texEqSource;
     this->texEqSource.replace('\n', ' ');
@@ -85,7 +89,11 @@ bool converter::convert()
 {
     if(!createTexFile()) return false;
     if(!createDviFile()) return false;
-    if(!createEpsFile()) return false;
+
+    if (this->convMode == converter::conv) {
+        if(!createEpsFile()) return false;
+    }
+
     return createPngFile();
 }
 

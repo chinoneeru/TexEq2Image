@@ -34,6 +34,7 @@ private slots:
     void writeIniFile();
     void saveText();
     bool checkIfExist(const QString &fileName);
+    void resizeEvent(QResizeEvent *);
 
 private slots:
     void on_pushButtonConvert_clicked();

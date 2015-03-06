@@ -105,7 +105,8 @@ void MainWindow::createPreview()
                 tr("preview"),
                 tr("png"),
                 *(this->packageList),
-                *(this->includeList));
+                *(this->includeList),
+                converter::prev);
 
     if(ret != true) return;
 
@@ -206,6 +207,15 @@ bool MainWindow::checkIfExist(const QString &fileName)
     } else {
         return false;
     }
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    ui->graphicsViewPreview->setGeometry(
+                ui->graphicsViewPreview->geometry().x(),
+                ui->graphicsViewPreview->geometry().y(),
+                event->size().width() - 20,
+                event->size().height() - 365);
 }
 
 void MainWindow::on_pushButtonConvert_clicked()
