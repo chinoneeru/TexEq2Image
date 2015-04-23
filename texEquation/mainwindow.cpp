@@ -9,6 +9,7 @@
 #include <QThread>
 #include <QTimer>
 #include <QStringList>
+#include "mySyntaxHighlighter.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -21,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
     autoPreview(true),
     impForm(0),
     packageList(0), includeList(0),
+    highlighter(0),
     iniFileKeyPathPlatex("pathPlatex"),
     iniFileKeyPathDvips("pathDvips"),
     iniFileKeyPathImageMagick("pathImageMagick"),
@@ -58,6 +60,8 @@ MainWindow::MainWindow(QWidget *parent) :
     includeList = new QStringList();
 
     loadIniFile();
+
+    highlighter = new mySyntaxHighlighter(ui->plainTextEditEq->document());
 }
 
 MainWindow::~MainWindow()
@@ -67,6 +71,7 @@ MainWindow::~MainWindow()
 
     writeIniFile();
 
+    delete highlighter;
     delete timer;
     delete convThread;
     delete impForm;

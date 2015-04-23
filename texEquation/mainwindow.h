@@ -75,6 +75,7 @@ private:
     bool autoPreview;
     importForm *impForm;
     QStringList *packageList, *includeList;
+    class mySyntaxHighlighter* highlighter;
 //    complementer *inputComp;
 
 private:

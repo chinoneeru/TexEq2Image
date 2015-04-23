@@ -36,6 +36,8 @@ void myPlainTextEdit::keyPressEvent(QKeyEvent *event)
     //bracketHighlighter(false);
     this->lastEnteredChar = event->key();
 
+    //std::cout << "keyPressEvent" << this->currentCharFormat().fontUnderline() << std::endl;
+
     if (event->modifiers().testFlag(Qt::ControlModifier)) {
         if(!simpleEmacsEmulator(event)){
             QPlainTextEdit::keyPressEvent(event);
@@ -66,10 +68,10 @@ void myPlainTextEdit::completion(QKeyEvent *event)
     this->blockSignals(true);
     //textEnhanced(true);
     this->insertPlainText(insert);
-    //textEnhanced(false);
     cursor = this->textCursor();
     cursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, insert.length());
     this->setTextCursor(cursor);
+    //textEnhanced(false);
     this->blockSignals(false);
 }
 
@@ -114,11 +116,21 @@ nothingToDo:
 
 void myPlainTextEdit::textEnhanced(bool enhanced)
 {
+    //cursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, 1);
     if(enhanced) {
-        this->setCurrentCharFormat(formatEnhanced);
+        std::cout << "enhance" << std::endl;
+        //this->setCurrentCharFormat(formatEnhanced);
+        (cursor = this->textCursor()).setCharFormat(formatEnhanced);
     } else {
-        this->setCurrentCharFormat(formatNormal);
+        std::cout << "unenhance" << std::endl;
+        //this->setCurrentCharFormat(formatNormal);
+        (cursor = this->textCursor()).setCharFormat(formatNormal);
     }
+
+    this->setTextCursor(cursor);
+
+    std::cout << "format change" << this->currentCharFormat().fontUnderline() << std::endl;
+    //cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, 1);
 }
 
 void myPlainTextEdit::bracketHighlighter()
@@ -131,8 +143,11 @@ void myPlainTextEdit::bracketHighlighter(bool fragEnhance)
     QTextCursor initialCursor = this->textCursor();
 
     //if(initialCursor.atStart()) return;
+    char charAtCursor = '\0';
 
-    char charAtCursor = this->toPlainText().at(initialCursor.position()).toLatin1();
+    if (0 < initialCursor.position() && initialCursor.position() <= this->toPlainText().length()){
+        charAtCursor = this->toPlainText().at(initialCursor.position() - 1).toLatin1();
+    }
     std::cout << "charAtCursor = " << charAtCursor << "; position = " << initialCursor.position() << std::endl;
 
     switch(charAtCursor){
@@ -144,7 +159,7 @@ void myPlainTextEdit::bracketHighlighter(bool fragEnhance)
     case ']':
         this->blockSignals(true);
         enhanceCharAtCursor(fragEnhance);
-        if(moveCursorToComplementaryBracket(charAtCursor, initialCursor.position()-1)){
+        if(moveCursorToComplementaryBracket(charAtCursor, initialCursor.position() - 1)){
             enhanceCharAtCursor(fragEnhance);
             //this->setTextCursor(initialCursor);
             std::cout << "returned" << std::endl;
@@ -159,15 +174,16 @@ void myPlainTextEdit::bracketHighlighter(bool fragEnhance)
 
 void myPlainTextEdit::enhanceCharAtCursor(bool enhance)
 {
-    char charAtCursor = this->toPlainText().at(this->textCursor().position()).toLatin1();
-    this->textCursor().deleteChar();
-    if(enhance) textEnhanced(true);
-    this->insertPlainText(tr("%1").arg(charAtCursor));
-    if(enhance) textEnhanced(false);
+    char charAtCursor = this->toPlainText().at(this->textCursor().position() - 1).toLatin1();
+    this->textCursor().deletePreviousChar();
 
-    QTextCursor tempCursor = this->textCursor();
+    textEnhanced(enhance);
+    this->insertPlainText(tr("%1").arg(charAtCursor));
+    textEnhanced(false);
+
+    /*QTextCursor tempCursor = this->textCursor();
     tempCursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, 1);
-    this->setTextCursor(tempCursor);
+    this->setTextCursor(tempCursor);*/
 }
 
 #define SEARCH_LEFT  -1

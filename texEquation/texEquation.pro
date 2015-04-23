@@ -16,12 +16,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     converter.cpp \
     myPlainTextEdit.cpp \
-    importform.cpp
+    importform.cpp \
+    mySyntaxHighlighter.cpp
 
 HEADERS  += mainwindow.h \
     converter.h \
     myPlainTextEdit.h \
-    importform.h
+    importform.h \
+    mySyntaxHighlighter.h
 
 FORMS    += mainwindow.ui \
     importform.ui
