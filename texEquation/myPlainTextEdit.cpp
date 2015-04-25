@@ -1,4 +1,5 @@
 #include "myPlainTextEdit.h"
+#include "blockHighlighter.h"
 #include <QMessageBox>
 #include <iostream>
 
@@ -7,7 +8,8 @@ myPlainTextEdit::myPlainTextEdit(QWidget *parent) :
     cursor(),
     formatNormal(),
     formatEnhanced(),
-    lastEnteredChar('\0')
+    lastEnteredChar('\0'),
+    blkHighlighter(0)
 {
     /*inputComp = new complementer(this);
     connect(this, SIGNAL(startInputCompletion(char,QPlainTextEdit*)),
@@ -18,11 +20,19 @@ myPlainTextEdit::myPlainTextEdit(QWidget *parent) :
 
     /*connect(this, SIGNAL(cursorPositionChanged()),
             this, SLOT(bracketHighlighter()));*/
+    blkHighlighter = new blockHighlighter(this);
+
+    connect(this, SIGNAL(textChanged()),
+            blkHighlighter, SLOT(setTextChangedFlag()));
+
+    /*connect(this, SIGNAL(cursorPositionChanged()),
+            blkHighlighter, SLOT(highlight()));*/
 }
 
 myPlainTextEdit::~myPlainTextEdit()
 {
     //delete inputComp; inputComp = 0;
+    delete blkHighlighter;
 }
 
 int myPlainTextEdit::getLastEnteredChar() const
@@ -46,6 +56,8 @@ void myPlainTextEdit::keyPressEvent(QKeyEvent *event)
         QPlainTextEdit::keyPressEvent(event);
         completion(event);
     }
+
+    blkHighlighter->highlight();
 }
 
 void myPlainTextEdit::completion(QKeyEvent *event)
@@ -65,14 +77,15 @@ void myPlainTextEdit::completion(QKeyEvent *event)
         return;
     }
 
-    this->blockSignals(true);
-    //textEnhanced(true);
+    //this->blockSignals(true);
     this->insertPlainText(insert);
     cursor = this->textCursor();
     cursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, insert.length());
     this->setTextCursor(cursor);
-    //textEnhanced(false);
-    this->blockSignals(false);
+    //this->blockSignals(false);
+
+    //emit textChanged();
+    //emit cursorPositionChanged();
 }
 
 bool myPlainTextEdit::simpleEmacsEmulator(QKeyEvent *event)

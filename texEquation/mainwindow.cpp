@@ -61,7 +61,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     loadIniFile();
 
-    highlighter = new mySyntaxHighlighter(ui->plainTextEditEq->document());
+    /*highlighter = new mySyntaxHighlighter(ui->plainTextEditEq->document(),
+                                          ui->plainTextEditEq);*/
 }
 
 MainWindow::~MainWindow()
@@ -71,7 +72,7 @@ MainWindow::~MainWindow()
 
     writeIniFile();
 
-    delete highlighter;
+    //delete highlighter;
     delete timer;
     delete convThread;
     delete impForm;

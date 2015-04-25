@@ -34,6 +34,7 @@ private:
     QTextCursor cursor;
     QTextCharFormat formatNormal, formatEnhanced;
     int lastEnteredChar;
+    class blockHighlighter* blkHighlighter;
     //complementer *inputComp;
 };
 

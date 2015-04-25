@@ -1,16 +1,13 @@
-#include "mySyntaxHighlighter.h"
+#include "blockHighlighter.h"
 #include "textTree.h"
+#include <QList>
 #include <QTextCharFormat>
 #include <iostream>
 
-mySyntaxHighlighter::mySyntaxHighlighter(QTextDocument *parent, QPlainTextEdit* editor) :
-    QSyntaxHighlighter(parent),
-    coursorPos(0),
-    editor(editor)
+blockHighlighter::blockHighlighter(QPlainTextEdit* editor) :
+    editor(editor),
+    textChangedFlag(false)
 {
-    connect(editor, SIGNAL(cursorPositionChanged()),
-            this, SLOT(updateCursorPos()));
-
     colors.push_back(QColor(0, 0, 0));
     colors.push_back(QColor(0, 0, 128));
     colors.push_back(QColor(0, 128, 0));
@@ -24,7 +21,7 @@ mySyntaxHighlighter::mySyntaxHighlighter(QTextDocument *parent, QPlainTextEdit* 
     txtTree = new textTree();
 }
 
-mySyntaxHighlighter::~mySyntaxHighlighter()
+blockHighlighter::~blockHighlighter()
 {
     for(int i = 0; i < formats.count(); i++){
         delete formats[i];
@@ -34,11 +31,14 @@ mySyntaxHighlighter::~mySyntaxHighlighter()
     delete txtTree;
 }
 
-void mySyntaxHighlighter::highlightBlock(const QString &text)
+void blockHighlighter::highlight()
 {
-    /*analyze(text);
+    if (textChangedFlag) {
+        analyze();
+        textChangedFlag = false;
+    }
 
-    int _coursorPos = coursorPos - currentBlock().position();
+    int coursorPos = editor->textCursor().position();
 
     textTreeNode *node = txtTree->root();
     textTreeNode *nextNode = 0;
@@ -47,7 +47,7 @@ void mySyntaxHighlighter::highlightBlock(const QString &text)
 
     while(node != 0) {
 
-        if (node->start() <= _coursorPos && _coursorPos <= node->end()) {
+        if (node->start() <= coursorPos && coursorPos <= node->end()) {
             if(node->depth() > maxDepth) {
                 highlightedNode = node;
                 maxDepth = node->depth();
@@ -62,20 +62,28 @@ void mySyntaxHighlighter::highlightBlock(const QString &text)
         }
     }
 
-    if (maxDepth == 0) return;
+    QList<QTextEdit::ExtraSelection> selections;
+    QTextEdit::ExtraSelection selection;
+    QTextCursor cursor = editor->textCursor();
 
-    QTextCharFormat format;
-    format.setBackground(Qt::cyan);
-    setFormat(
-                highlightedNode->start(),
-                highlightedNode->end() - highlightedNode->start() + 1,
-                format
-                );*/
+    if (highlightedNode->depth() > 0 ) {
+        selection.format.setBackground(Qt::cyan);
+        //int iniPos = cursor.position();
+        cursor.setPosition(highlightedNode->start());
+        cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor,
+                            highlightedNode->end() - highlightedNode->start() + 1);
+    } else {
+        selection.format.setBackground(Qt::white);
+    }
+
+    selection.cursor = cursor;
+    selections.append(selection);
+    editor->setExtraSelections(selections);
 }
 
-/*
-void mySyntaxHighlighter::analyze(const QString &text)
+void blockHighlighter::analyze()
 {
+    QString text = editor->toPlainText();
     txtTree->clear();
     textTreeNode* node = txtTree->root();
     node->setStart(0);
@@ -98,12 +106,8 @@ void mySyntaxHighlighter::analyze(const QString &text)
         }
     }
 }
-*/
 
-void mySyntaxHighlighter::updateCursorPos()
+void blockHighlighter::setTextChangedFlag()
 {
-    coursorPos = editor->textCursor().position();
-    std::cout << "coursor position: " << (int)coursorPos << std::endl;
-    rehighlight();
-    //rehighlightBlock(currentBlock());
+    textChangedFlag = true;
 }

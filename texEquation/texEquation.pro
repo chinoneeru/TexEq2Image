@@ -17,13 +17,19 @@ SOURCES += main.cpp\
     converter.cpp \
     myPlainTextEdit.cpp \
     importform.cpp \
-    mySyntaxHighlighter.cpp
+    mySyntaxHighlighter.cpp \
+    textTree.cpp \
+    textTreeNode.cpp \
+    blockHighlighter.cpp
 
 HEADERS  += mainwindow.h \
     converter.h \
     myPlainTextEdit.h \
     importform.h \
-    mySyntaxHighlighter.h
+    mySyntaxHighlighter.h \
+    textTree.h \
+    textTreeNode.h \
+    blockHighlighter.h
 
 FORMS    += mainwindow.ui \
     importform.ui
