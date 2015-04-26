@@ -6,18 +6,12 @@
 
 blockHighlighter::blockHighlighter(QPlainTextEdit* editor) :
     editor(editor),
-    textChangedFlag(false)
+    txtTree(0),
+    textChangedFlag(false),
+    brushNormal(QColor(0xff, 0xff, 0xff)),
+    brushCorrect(QColor(0xe4, 0xd2, 0xd8)),
+    brushMiss(QColor(0xf5, 0xb1, 0xaa))
 {
-    colors.push_back(QColor(0, 0, 0));
-    colors.push_back(QColor(0, 0, 128));
-    colors.push_back(QColor(0, 128, 0));
-    colors.push_back(QColor(128, 0, 0));
-
-    for(int i = 0; i < colors.count(); i++){
-        formats.push_back(new QTextCharFormat());
-        formats.at(i)->setForeground(colors.at(i));
-    }
-
     txtTree = new textTree();
 
     connect(this->editor, SIGNAL(textChanged()),
@@ -29,11 +23,6 @@ blockHighlighter::blockHighlighter(QPlainTextEdit* editor) :
 
 blockHighlighter::~blockHighlighter()
 {
-    for(int i = 0; i < formats.count(); i++){
-        delete formats[i];
-    }
-    formats.clear();
-
     delete txtTree;
 }
 
@@ -76,20 +65,20 @@ void blockHighlighter::highlight()
 
     if (highlightedNode->depth() == 0) { /*root-block*/
         if (highlightedNode->blockClosed()) { /*root-block cannot be closed if no mistake occures.*/
-            selection.format.setBackground(Qt::magenta);
+            selection.format.setBackground(brushMiss);
             cursor.setPosition(highlightedNode->start());
             cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor,
                                 highlightedNode->end() - highlightedNode->start() + 1);
         } else {
-            selection.format.setBackground(Qt::white);
+            selection.format.setBackground(brushNormal);
         }
     } else {
         if (highlightedNode->blockClosed() &&
                 isParenthesisMatched(highlightedNode->start(), highlightedNode->end(), text)
                 ) {
-            selection.format.setBackground(Qt::cyan);
+            selection.format.setBackground(brushCorrect);
         } else {
-            selection.format.setBackground(Qt::magenta);
+            selection.format.setBackground(brushMiss);
         }
         cursor.setPosition(highlightedNode->start());
         cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor,

@@ -7,6 +7,7 @@
 #include <QVector>
 #include <QColor>
 #include <QPlainTextEdit>
+#include <QBrush>
 
 class blockHighlighter : public QObject {
 
@@ -25,12 +26,11 @@ private slots:
     bool isParenthesisMatched(int leftPos, int rightPos, const QString& text);
 
 private:
-    QVector<QColor> colors;
-    QVector<QTextCharFormat*> formats;
     //int coursorPos;
     QPlainTextEdit* editor;
     class textTree* txtTree;
     bool textChangedFlag;
+    QBrush brushNormal, brushCorrect, brushMiss;
 };
 
 #endif // BLOCKHIGHLIGHTER_H

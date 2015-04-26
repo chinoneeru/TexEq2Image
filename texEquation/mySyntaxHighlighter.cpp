@@ -7,9 +7,9 @@ mySyntaxHighlighter::mySyntaxHighlighter(QPlainTextEdit* editor) :
     coursorPos(0),
     editor(editor)
 {
-    formatTexWord.setForeground(Qt::darkBlue);
-    formatTexWord.setFontWeight(QFont::Bold);
-    formatNumber.setForeground(Qt::darkMagenta);
+    formatTexWord.setForeground(QColor(0x00, 0xa4, 0x97));
+    //formatTexWord.setFontWeight(QFont::Bold);
+    formatNumber.setForeground(QColor(0xc8, 0x99, 0x32));
 }
 
 mySyntaxHighlighter::~mySyntaxHighlighter()
