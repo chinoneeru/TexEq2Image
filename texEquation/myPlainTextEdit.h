@@ -35,6 +35,7 @@ private:
     QTextCharFormat formatNormal, formatEnhanced;
     int lastEnteredChar;
     class blockHighlighter* blkHighlighter;
+    class mySyntaxHighlighter* myHighlighter;
     //complementer *inputComp;
 };
 

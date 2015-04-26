@@ -7,18 +7,18 @@
 #include <QVector>
 #include <QColor>
 #include <QPlainTextEdit>
+#include <QTextCharFormat>
 
 class mySyntaxHighlighter : public QSyntaxHighlighter {
 
     Q_OBJECT
 
 public:
-    mySyntaxHighlighter(QTextDocument * parent, QPlainTextEdit* editor);
+    mySyntaxHighlighter(QPlainTextEdit* editor);
     virtual ~mySyntaxHighlighter();
     void highlightBlock(const QString& text);
 
 private slots:
-    void updateCursorPos();
     //enum status{coursor
     //void applyFormat(int start, int count);
     //void setFontColor(const QColor& color);
@@ -27,8 +27,7 @@ private slots:
     //void analyze(const QString& text);
 
 private:
-    QVector<QColor> colors;
-    QVector<QTextCharFormat*> formats;
+    QTextCharFormat formatTexWord, formatNumber;
     int coursorPos;
     QPlainTextEdit* editor;
     class textTree* txtTree;

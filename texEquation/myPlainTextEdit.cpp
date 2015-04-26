@@ -1,5 +1,6 @@
 #include "myPlainTextEdit.h"
 #include "blockHighlighter.h"
+#include "mySyntaxHighlighter.h"
 #include <QMessageBox>
 #include <iostream>
 
@@ -9,7 +10,8 @@ myPlainTextEdit::myPlainTextEdit(QWidget *parent) :
     formatNormal(),
     formatEnhanced(),
     lastEnteredChar('\0'),
-    blkHighlighter(0)
+    blkHighlighter(0),
+    myHighlighter(0)
 {
     /*inputComp = new complementer(this);
     connect(this, SIGNAL(startInputCompletion(char,QPlainTextEdit*)),
@@ -19,6 +21,7 @@ myPlainTextEdit::myPlainTextEdit(QWidget *parent) :
     formatEnhanced.setFontUnderline(true);
 
     blkHighlighter = new blockHighlighter(this);
+    myHighlighter = new mySyntaxHighlighter(this);
 }
 
 myPlainTextEdit::~myPlainTextEdit()
