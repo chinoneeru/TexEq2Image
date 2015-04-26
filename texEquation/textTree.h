@@ -8,13 +8,13 @@ class textTree {
 public:
     textTree();
     ~textTree();
-    void clear();
+    void clear(int textLength);
     textTreeNode* root() const;
     textTreeNode* down();
     textTreeNode* up();
 
 private:
-    void initialize();
+    void initialize(int textLength);
 
 private:
     class textTreeNode* _root;

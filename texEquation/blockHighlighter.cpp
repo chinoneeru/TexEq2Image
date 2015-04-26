@@ -19,6 +19,12 @@ blockHighlighter::blockHighlighter(QPlainTextEdit* editor) :
     }
 
     txtTree = new textTree();
+
+    connect(this->editor, SIGNAL(textChanged()),
+            this, SLOT(setTextChangedFlag()));
+
+    connect(this->editor, SIGNAL(cursorPositionChanged()),
+            this, SLOT(highlight()));
 }
 
 blockHighlighter::~blockHighlighter()
@@ -33,8 +39,10 @@ blockHighlighter::~blockHighlighter()
 
 void blockHighlighter::highlight()
 {
+    QString text = editor->toPlainText();
+
     if (textChangedFlag) {
-        analyze();
+        analyze(text);
         textChangedFlag = false;
     }
 
@@ -66,14 +74,26 @@ void blockHighlighter::highlight()
     QTextEdit::ExtraSelection selection;
     QTextCursor cursor = editor->textCursor();
 
-    if (highlightedNode->depth() > 0 ) {
-        selection.format.setBackground(Qt::cyan);
-        //int iniPos = cursor.position();
+    if (highlightedNode->depth() == 0) { /*root-block*/
+        if (highlightedNode->blockClosed()) { /*root-block cannot be closed if no mistake occures.*/
+            selection.format.setBackground(Qt::magenta);
+            cursor.setPosition(highlightedNode->start());
+            cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor,
+                                highlightedNode->end() - highlightedNode->start() + 1);
+        } else {
+            selection.format.setBackground(Qt::white);
+        }
+    } else {
+        if (highlightedNode->blockClosed() &&
+                isParenthesisMatched(highlightedNode->start(), highlightedNode->end(), text)
+                ) {
+            selection.format.setBackground(Qt::cyan);
+        } else {
+            selection.format.setBackground(Qt::magenta);
+        }
         cursor.setPosition(highlightedNode->start());
         cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor,
                             highlightedNode->end() - highlightedNode->start() + 1);
-    } else {
-        selection.format.setBackground(Qt::white);
     }
 
     selection.cursor = cursor;
@@ -81,13 +101,10 @@ void blockHighlighter::highlight()
     editor->setExtraSelections(selections);
 }
 
-void blockHighlighter::analyze()
+void blockHighlighter::analyze(const QString& text)
 {
-    QString text = editor->toPlainText();
-    txtTree->clear();
+    txtTree->clear(text.count());
     textTreeNode* node = txtTree->root();
-    node->setStart(0);
-    node->setEnd(text.count()-1);
 
     for(int i = 0; i < text.count(); i++) {
         switch(text.at(i).toLatin1()) {
@@ -110,4 +127,31 @@ void blockHighlighter::analyze()
 void blockHighlighter::setTextChangedFlag()
 {
     textChangedFlag = true;
+    highlight();
+}
+
+bool blockHighlighter::isParenthesisMatched(int leftPos, int rightPos, const QString& text)
+{
+    char l = text.at(leftPos).toLatin1();
+    char r = text.at(rightPos).toLatin1();
+
+    //std::cout << "l = " << l << std::endl;
+    //std::cout << "r = " << r << std::endl;
+
+    switch(l) {
+    case '(':
+        if (r == ')') return true;
+        break;
+    case '{':
+        if (r == '}') return true;
+        break;
+    case '[':
+        if (r == ']') return true;
+        break;
+    default:
+        return true;
+        break;
+    }
+
+    return false;
 }

@@ -3,7 +3,7 @@
 
 textTree::textTree()
 {
-    initialize();
+    initialize(0);
 }
 
 textTree::~textTree()
@@ -12,17 +12,17 @@ textTree::~textTree()
     _root = 0;
 }
 
-void textTree::initialize()
+void textTree::initialize(int textLength)
 {
-    _root = new textTreeNode(0);
+    _root = new textTreeNode(0, 0, textLength-1);
     currentNode = _root;
 }
 
-void textTree::clear()
+void textTree::clear(int textLength)
 {
     delete _root;
     _root = 0;
-    initialize();
+    initialize(textLength);
 }
 
 textTreeNode* textTree::root() const
@@ -38,7 +38,7 @@ textTreeNode* textTree::down()
 
 textTreeNode* textTree::up()
 {
-    if (currentNode != 0) {
+    if (currentNode->parent() != 0) {
         currentNode = currentNode->parent();
     }
     return currentNode;

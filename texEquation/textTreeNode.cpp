@@ -1,11 +1,12 @@
 #include "textTreeNode.h"
 #include <iostream>
 
-textTreeNode::textTreeNode(textTreeNode *parent) :
+textTreeNode::textTreeNode(textTreeNode *parent, int start, int end) :
     _parent(parent),
-    _start(0),
-    _end(0),
-    focusedChilde(0)
+    _start(start),
+    _end(end),
+    focusedChilde(0),
+    _blockClosed(false)
 {
     if(_parent != 0) {
         //std::cout << "parent's depth = " << (int)(_parent->depth()) << std::endl;
@@ -44,6 +45,8 @@ void textTreeNode::setStart(int startPos)
 void textTreeNode::setEnd(int endPos)
 {
     _end = endPos;
+
+    _blockClosed = true;
 }
 
 int textTreeNode::start() const
@@ -64,6 +67,11 @@ int textTreeNode::depth() const
 textTreeNode* textTreeNode::parent() const
 {
     return _parent;
+}
+
+bool textTreeNode::blockClosed() const
+{
+    return _blockClosed;
 }
 
 textTreeNode* textTreeNode::nextChilde()

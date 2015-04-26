@@ -18,15 +18,7 @@ myPlainTextEdit::myPlainTextEdit(QWidget *parent) :
     formatEnhanced = this->currentCharFormat();
     formatEnhanced.setFontUnderline(true);
 
-    /*connect(this, SIGNAL(cursorPositionChanged()),
-            this, SLOT(bracketHighlighter()));*/
     blkHighlighter = new blockHighlighter(this);
-
-    connect(this, SIGNAL(textChanged()),
-            blkHighlighter, SLOT(setTextChangedFlag()));
-
-    /*connect(this, SIGNAL(cursorPositionChanged()),
-            blkHighlighter, SLOT(highlight()));*/
 }
 
 myPlainTextEdit::~myPlainTextEdit()
@@ -56,8 +48,6 @@ void myPlainTextEdit::keyPressEvent(QKeyEvent *event)
         QPlainTextEdit::keyPressEvent(event);
         completion(event);
     }
-
-    blkHighlighter->highlight();
 }
 
 void myPlainTextEdit::completion(QKeyEvent *event)
@@ -127,6 +117,7 @@ nothingToDo:
     return false;
 }
 
+/*
 void myPlainTextEdit::textEnhanced(bool enhanced)
 {
     //cursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, 1);
@@ -155,7 +146,6 @@ void myPlainTextEdit::bracketHighlighter(bool fragEnhance)
 {
     QTextCursor initialCursor = this->textCursor();
 
-    //if(initialCursor.atStart()) return;
     char charAtCursor = '\0';
 
     if (0 < initialCursor.position() && initialCursor.position() <= this->toPlainText().length()){
@@ -193,10 +183,6 @@ void myPlainTextEdit::enhanceCharAtCursor(bool enhance)
     textEnhanced(enhance);
     this->insertPlainText(tr("%1").arg(charAtCursor));
     textEnhanced(false);
-
-    /*QTextCursor tempCursor = this->textCursor();
-    tempCursor.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, 1);
-    this->setTextCursor(tempCursor);*/
 }
 
 #define SEARCH_LEFT  -1
@@ -226,7 +212,6 @@ bool myPlainTextEdit::moveCursorToComplementaryBracket(char bracket, int cursorP
 
     std::cout << "text.at(cursorPos) = " << text.at(cursorPos).toLatin1() << "; position = " << cursorPos << std::endl;
 
-    //QMessageBox::about(0, tr(""), tr("%1").arg(text.at(cursorPos)));
     int newCursorPos = cursorPos;
     for(; newCursorPos < text.length() && newCursorPos >= 0; newCursorPos += searchDirection){
         if (text.at(newCursorPos) == bracket) {
@@ -254,3 +239,4 @@ bool myPlainTextEdit::moveCursorToComplementaryBracket(char bracket, int cursorP
         return false;
     }
 }
+*/

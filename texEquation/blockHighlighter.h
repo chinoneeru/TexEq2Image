@@ -21,7 +21,8 @@ public slots:
     void setTextChangedFlag();
 
 private slots:
-    void analyze();
+    void analyze(const QString &text);
+    bool isParenthesisMatched(int leftPos, int rightPos, const QString& text);
 
 private:
     QVector<QColor> colors;

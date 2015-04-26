@@ -21,11 +21,11 @@ protected slots:
 private slots:
     void completion(QKeyEvent *event);
     bool simpleEmacsEmulator(QKeyEvent *event);
-    void textEnhanced(bool enhanced);
-    void bracketHighlighter();
-    void bracketHighlighter(bool fragEnhance);
-    void enhanceCharAtCursor(bool enhance);
-    bool moveCursorToComplementaryBracket(char bracket, int cursorPos);
+    //void textEnhanced(bool enhanced);
+    //void bracketHighlighter();
+    //void bracketHighlighter(bool fragEnhance);
+    //void enhanceCharAtCursor(bool enhance);
+    //bool moveCursorToComplementaryBracket(char bracket, int cursorPos);
 
 signals:
     void startInputCompletion(char lastInputedChar, QPlainTextEdit *textEdit);
