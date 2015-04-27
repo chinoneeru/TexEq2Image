@@ -3,6 +3,7 @@
 #include "converter.h"
 #include <QPlainTextEdit>
 #include <QFileDialog>
+#include <QFontDialog>
 #include <QTextStream>
 #include <QFile>
 #include <QMessageBox>
@@ -25,10 +26,12 @@ MainWindow::MainWindow(QWidget *parent) :
     highlighter(0),
     iniFileKeyPathPlatex("pathPlatex"),
     iniFileKeyPathDvips("pathDvips"),
-    iniFileKeyPathImageMagick("pathImageMagick"),
+    iniFileKeyPathDvipng("pathDvipng"),
     iniFileKeyPackageList("packageList"),
     iniFileKeyIncludeList("includeList"),
-    iniFileKeyLastSaveDir("lastSaveDir")
+    iniFileKeyLastSaveDir("lastSaveDir"),
+    iniFileKeyFontList("fontList"),
+    iniFileKeyEditorFont("editorFont")
 {
     ui->setupUi(this);
     ui->graphicsViewPreview->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -107,7 +110,7 @@ void MainWindow::createPreview()
 {
     bool ret = conv->setup(ui->plainTextEditEq->toPlainText(),
                 2,
-                ui->comboBoxFont->currentIndex(),
+                ui->comboBoxFont->currentText(),
                 tr("preview"),
                 tr("png"),
                 *(this->packageList),
@@ -164,14 +167,18 @@ void MainWindow::loadIniFile()
     QTextStream in(&iniFile);
     QString buf;
     QStringList keyAndValue;
+    QFont fontTmp;
+
     while((buf = in.readLine()) != "") {
         keyAndValue = buf.split('=');
-        if(keyAndValue[0] == this->iniFileKeyPathPlatex) this->conv->subscribePathPlatex(keyAndValue[1]);//this->pathPlatex = keyAndValue[1];
-        if(keyAndValue[0] == this->iniFileKeyPathDvips ) this->conv->subscribePathDvips(keyAndValue[1]);//this->pathDvips  = keyAndValue[1];
-        if(keyAndValue[0] == this->iniFileKeyPathImageMagick) this->conv->subscribePathImageMagick(keyAndValue[1]);//this->pathImageMagick = keyAndValue[1];
+        if(keyAndValue[0] == this->iniFileKeyPathPlatex ) this->conv->subscribePathPlatex(keyAndValue[1]);
+        if(keyAndValue[0] == this->iniFileKeyPathDvips  ) this->conv->subscribePathDvips(keyAndValue[1]);
+        if(keyAndValue[0] == this->iniFileKeyPathDvipng ) this->conv->subscribePathDvipng(keyAndValue[1]);
         if(keyAndValue[0] == this->iniFileKeyPackageList) this->packageList->push_back(keyAndValue[1]);
         if(keyAndValue[0] == this->iniFileKeyIncludeList) this->includeList->push_back(keyAndValue[1]);
         if(keyAndValue[0] == this->iniFileKeyLastSaveDir) this->savePath = keyAndValue[1];
+        if(keyAndValue[0] == this->iniFileKeyFontList   ) setFontList(keyAndValue[1]);
+        if(keyAndValue[0] == this->iniFileKeyEditorFont ) {fontTmp.fromString(keyAndValue[1]); ui->plainTextEditEq->setFont(fontTmp);}
     }
     iniFile.close();
 }
@@ -181,16 +188,25 @@ void MainWindow::writeIniFile()
     QFile iniFile(tr("ini.cfg"));
     if(!iniFile.open(QIODevice::WriteOnly)) return;
     QTextStream out(&iniFile);
-    out << this->iniFileKeyPathPlatex << '=' << this->conv->getPathPlatex() << endl;
-    out << this->iniFileKeyPathDvips  << '=' << this->conv->getPathDvips()  << endl;
-    out << this->iniFileKeyPathImageMagick << '=' << this->conv->getPathImageMagick() << endl;
-    out << this->iniFileKeyLastSaveDir << '=' << this->savePath << endl;
-    for(int i = 0; i < this->packageList->size(); i++){
-        out << this->iniFileKeyPackageList << '=' << this->packageList->at(i) << endl;
+    out << iniFileKeyPathPlatex << '=' << conv->getPathPlatex() << endl;
+    out << iniFileKeyPathDvips  << '=' << conv->getPathDvips()  << endl;
+    out << iniFileKeyPathDvipng << '=' << conv->getPathDvipng() << endl;
+    out << iniFileKeyLastSaveDir << '=' << savePath << endl;
+
+    for(int i = 0; i < packageList->size(); i++){
+        out << iniFileKeyPackageList << '=' << packageList->at(i) << endl;
     }
-    for(int i = 0; i < this->includeList->size(); i++){
-        out << this->iniFileKeyIncludeList << '=' << this->includeList->at(i) << endl;
+
+    for(int i = 0; i < includeList->size(); i++){
+        out << iniFileKeyIncludeList << '=' << includeList->at(i) << endl;
     }
+
+    for(int i = 1; i < ui->comboBoxFont->count(); i++){
+        out << iniFileKeyFontList << '=' << ui->comboBoxFont->itemText(i) << endl;
+    }
+
+    out << iniFileKeyEditorFont << '=' << ui->plainTextEditEq->font().toString() << endl;
+
     iniFile.close();
 }
 
@@ -215,8 +231,25 @@ bool MainWindow::checkIfExist(const QString &fileName)
     }
 }
 
+void MainWindow::setFontList(const QString &font)
+{
+    ui->comboBoxFont->addItem(font);
+}
+
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
+    ui->frame->setGeometry(
+                event->size().width() - 10 - ui->frame->geometry().width(),
+                ui->frame->geometry().y(),
+                ui->frame->geometry().width(),
+                ui->frame->geometry().height());
+
+    ui->plainTextEditEq->setGeometry(
+                ui->plainTextEditEq->geometry().x(),
+                ui->plainTextEditEq->geometry().y(),
+                event->size().width() - 10 - ui->frame->geometry().width() - 10 - 10,
+                ui->plainTextEditEq->geometry().height());
+
     ui->graphicsViewPreview->setGeometry(
                 ui->graphicsViewPreview->geometry().x(),
                 ui->graphicsViewPreview->geometry().y(),
@@ -241,7 +274,7 @@ void MainWindow::on_pushButtonConvert_clicked()
 
     bool ret = conv->setup(ui->plainTextEditEq->toPlainText(),
                   ui->spinBoxMagnitude->value(),
-                  ui->comboBoxFont->currentIndex(),
+                  ui->comboBoxFont->currentText(),
                   tr("%1%2").arg(savePath).arg(ui->lineEditName->text()),
                   ui->comboBoxImageType->currentText(),
                   *(this->packageList),
@@ -287,9 +320,10 @@ void MainWindow::on_actionPlatex_triggered()
     conv->subscribePathPlatex(QFileDialog::getExistingDirectory(this, tr("Select Directory")));
 }
 
-void MainWindow::on_actionImageMagick_triggered()
+void MainWindow::on_actionDviPng_triggered()
 {
-    conv->subscribePathImageMagick(QFileDialog::getExistingDirectory(this, tr("Select Directory")));
+    //conv->subscribePathImageMagick(QFileDialog::getExistingDirectory(this, tr("Select Directory")));
+    conv->subscribePathDvipng(QFileDialog::getExistingDirectory(this, tr("Select Directory")));
 }
 
 void MainWindow::on_plainTextEditEq_textChanged()
@@ -343,4 +377,18 @@ void MainWindow::on_actionSave_text_triggered()
 void MainWindow::on_comboBoxFont_currentIndexChanged(const QString &arg1)
 {
     createPreview();
+}
+
+/*void MainWindow::on_comboBoxFont_currentTextChanged(const QString &arg1)
+{
+    createPreview();
+}*/
+
+void MainWindow::on_actionFont_triggered()
+{
+    bool isOk;
+    QFont newFont = QFontDialog::getFont(&isOk, ui->plainTextEditEq->font(), this);
+    if(isOk) {
+        ui->plainTextEditEq->setFont(newFont);
+    }
 }

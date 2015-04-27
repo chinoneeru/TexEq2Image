@@ -6,8 +6,6 @@
 #include <QStringList>
 #include <iostream>
 
-#define FONT_ID_DEFAULT 0
-
 #define PLATEX_TIMEOUT_INTERVAL 500
 #define PLATEX_MAX_TRY_COUNT 40
 
@@ -17,7 +15,7 @@ converter::converter(QObject *parent, QComboBox *comboBoxFont) :
     QObject(parent),
     fontList(0),
     magnitude(1),
-    font(FONT_ID_DEFAULT),
+    font("default"),
     texEqSource(""),
     fileName("temp"),
     type("png"),
@@ -30,7 +28,7 @@ converter::converter(QObject *parent, QComboBox *comboBoxFont) :
     this->platex = new QProcess(this);
     this->dvips  = new QProcess(this);
     this->dvipng = new QProcess(this);
-    this->imageMagickConvert = new QProcess(this);
+    //this->imageMagickConvert = new QProcess(this);
 
 
     fontList.clear();
@@ -46,18 +44,14 @@ converter::~converter()
     delete imageMagickConvert; imageMagickConvert = 0;
 }
 
-bool converter::setup(const QString &texEqSource, const int magnitude, const int font,
+bool converter::setup(const QString &texEqSource, const int magnitude, const QString& font,
                       const QString &fileName, const QString &type,
                       const QStringList &packageList, const QStringList &includeList,
                       const mode md)
 {
     if(this->pathPlatex == "") return false;
     if(this->pathDvips  == "") return false;
-    if(this->type == "png") {
-        if(this->pathDvipng == "") return false;
-    } else {
-        if(this->pathImageMagick == "") return false;
-    }
+    if(this->pathDvipng == "") return false;
 
     this->convMode = md;
 
@@ -90,11 +84,10 @@ bool converter::convert()
     if(!createTexFile()) return false;
     if(!createDviFile()) return false;
 
-    if (this->convMode == converter::conv) {
-        if(!createEpsFile()) return false;
-    }
+    if(type == "eps") return createEpsFile();
+    if(type == "png") return createPngFile();
 
-    return createPngFile();
+    return false;
 }
 
 bool converter::createTexFile()
@@ -104,8 +97,8 @@ bool converter::createTexFile()
     QTextStream out(&texFile);
 
     out << tr("\\documentclass{jarticle}") << endl;
-    if(this->font != FONT_ID_DEFAULT) {
-        out << tr("\\usepackage{%1}").arg(fontList[this->font]) << endl;
+    if(font != "default") {
+        out << tr("\\usepackage{%1}").arg(font) << endl;
     }
     out << this->preamble << endl;
     out << tr("\\begin{document}") << endl;
@@ -237,7 +230,7 @@ QString converter::getPathDvips() const
     return this->pathDvips;
 }
 
-QString converter::getPathImageMagick() const
+QString converter::getPathDvipng() const
 {
-    return this->pathImageMagick;
+    return this->pathDvipng;
 }

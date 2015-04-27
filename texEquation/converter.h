@@ -16,7 +16,7 @@ public:
     converter(QObject *parent = 0, QComboBox *comboBoxFont = 0);
     ~converter();
     bool isSuccessed() { return conversionSuccessed; }
-    bool setup(const QString &texEqSource, const int magnitude, const int font,
+    bool setup(const QString &texEqSource, const int magnitude, const QString &font,
                const QString &fileName, const QString &type,
                const QStringList &packageList, const QStringList &includeList,
                const mode md = conv);
@@ -29,7 +29,7 @@ public slots:
     void subscribePathImageMagick(const QString &pathImageMagick);
     QString getPathPlatex() const;
     QString getPathDvips() const;
-    QString getPathImageMagick() const;
+    QString getPathDvipng() const;
 
 signals:
     void convFinished(void);
@@ -46,7 +46,8 @@ private:
 
 private:
     QStringList fontList;
-    int magnitude, font;
+    int magnitude;
+    QString font;
     QString texEqSource, fileName, type;
     QString pathPlatex, pathDvips, pathDvipng, pathImageMagick;
     class QProcess *platex;

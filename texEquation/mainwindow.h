@@ -33,7 +33,8 @@ private slots:
     void loadIniFile();
     void writeIniFile();
     void saveText();
-    bool checkIfExist(const QString &fileName);
+    bool checkIfExist(const QString& fileName);
+    void setFontList(const QString& font);
     void resizeEvent(QResizeEvent *);
 
 private slots:
@@ -49,7 +50,7 @@ private slots:
 
     void on_actionPlatex_triggered();
 
-    void on_actionImageMagick_triggered();
+    void on_actionDviPng_triggered();
 
     void on_plainTextEditEq_textChanged();
 
@@ -60,6 +61,10 @@ private slots:
     //void on_actionSave_text_triggered();
 
     void on_comboBoxFont_currentIndexChanged(const QString &arg1);
+
+    //void on_comboBoxFont_currentTextChanged(const QString &arg1);
+
+    void on_actionFont_triggered();
 
 signals:
     void startConversion();
@@ -81,10 +86,12 @@ private:
 private:
     const QString iniFileKeyPathPlatex;
     const QString iniFileKeyPathDvips;
-    const QString iniFileKeyPathImageMagick;
+    const QString iniFileKeyPathDvipng;
     const QString iniFileKeyPackageList;
     const QString iniFileKeyIncludeList;
     const QString iniFileKeyLastSaveDir;
+    const QString iniFileKeyFontList;
+    const QString iniFileKeyEditorFont;
 };
 
 #endif // MAINWINDOW_H
