@@ -23,7 +23,7 @@ public:
 
 public slots:
     void execute();
-    void subscribePathPlatex(const QString &pathPlatex);
+    void subscribePathPlatex(const QString &pathLatex);
     void subscribePathDvips(const QString &pathDvips);
     void subscribePathDvipng(const QString &pathDvipng);
     void subscribePathImageMagick(const QString &pathImageMagick);
@@ -49,8 +49,8 @@ private:
     int magnitude;
     QString font;
     QString texEqSource, fileName, type;
-    QString pathPlatex, pathDvips, pathDvipng, pathImageMagick;
-    class QProcess *platex;
+    QString pathLatex, pathDvips, pathDvipng, pathImageMagick;
+    class QProcess *latex;
     class QProcess *dvips;
     class QProcess *dvipng;
     class QProcess *imageMagickConvert;

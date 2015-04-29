@@ -19,16 +19,16 @@ converter::converter(QObject *parent, QComboBox *comboBoxFont) :
     texEqSource(""),
     fileName("temp"),
     type("png"),
-    pathPlatex(""), pathDvips(""), pathDvipng(""), pathImageMagick(""),
-    platex(0), dvips(0), dvipng(0), imageMagickConvert(0),
+    pathLatex(""), pathDvips(""), pathDvipng(""), pathImageMagick(""),
+    latex(0), dvips(0), dvipng(0), imageMagickConvert(0),
     conversionSuccessed(false),
     preamble(""),
     convMode(prev)
 {
-    this->platex = new QProcess(this);
+    this->latex = new QProcess(this);
     this->dvips  = new QProcess(this);
     this->dvipng = new QProcess(this);
-    //this->imageMagickConvert = new QProcess(this);
+    this->imageMagickConvert = new QProcess(this);
 
 
     fontList.clear();
@@ -39,7 +39,7 @@ converter::converter(QObject *parent, QComboBox *comboBoxFont) :
 
 converter::~converter()
 {
-    delete platex; platex = 0;
+    delete latex; latex = 0;
     delete dvips; dvips = 0;
     delete imageMagickConvert; imageMagickConvert = 0;
 }
@@ -49,7 +49,7 @@ bool converter::setup(const QString &texEqSource, const int magnitude, const QSt
                       const QStringList &packageList, const QStringList &includeList,
                       const mode md)
 {
-    if(this->pathPlatex == "") return false;
+    if(this->pathLatex == "") return false;
     if(this->pathDvips  == "") return false;
     if(this->pathDvipng == "") return false;
 
@@ -96,7 +96,8 @@ bool converter::createTexFile()
     texFile.open(QIODevice::WriteOnly);
     QTextStream out(&texFile);
 
-    out << tr("\\documentclass{jarticle}") << endl;
+    out << tr("\\documentclass{article}") << endl;
+    out << tr("\\usepackage[T1]{fontenc}") << endl;
     if(font != "default") {
         out << tr("\\usepackage{%1}").arg(font) << endl;
     }
@@ -115,27 +116,27 @@ bool converter::createTexFile()
 bool converter::createDviFile()
 {
     //std::cout << "entered 'createDviFile'" << std::endl;
-    if(!processExecutable(this->platex)) {
+    if(!processExecutable(this->latex)) {
         //std::cout << "platex is not executable" << std::endl;
         return false;
     }
 
-    this->platex->start(tr("%1/platex temp.tex").arg(this->pathPlatex));
+    this->latex->start(tr("%1/latex temp.tex").arg(this->pathLatex));
 
     bool successed = true;
     int loopCounter = 0;
 
-    QString platexStdOut;
+    QString latexStdOut;
     while(1){
-        bool finished = this->platex->waitForFinished(PLATEX_TIMEOUT_INTERVAL);
-        platexStdOut += this->platex->readAllStandardOutput();
+        bool finished = this->latex->waitForFinished(PLATEX_TIMEOUT_INTERVAL);
+        latexStdOut += this->latex->readAllStandardOutput();
         if(finished) {
             break;
         } else {
-            if(platexStdOut.contains(tr("? ")) ||
-               platexStdOut.contains(tr("Enter file name: ")))
+            if(latexStdOut.contains(tr("? ")) ||
+               latexStdOut.contains(tr("Enter file name: ")))
             {
-                this->platex->write(tr("X\n").toLocal8Bit());
+                this->latex->write(tr("X\n").toLocal8Bit());
                 //std::cout << "platex finished with some error" << std::endl;
                 successed = false;
             }
@@ -143,7 +144,7 @@ bool converter::createDviFile()
 
         if(++loopCounter > PLATEX_MAX_TRY_COUNT) {
             successed = false;
-            this->platex->terminate();
+            this->latex->terminate();
             break;
         }
     }
@@ -165,6 +166,7 @@ bool converter::createEpsFile()
 
 bool converter::createPngFile()
 {
+    /*
     if (this->type == "png") {
 
         if(!processExecutable(this->dvipng)) return false;
@@ -187,6 +189,23 @@ bool converter::createPngFile()
         return this->imageMagickConvert->waitForFinished(PROCESS_TIMEOUT);
 
     }
+    */
+    if(!createEpsFile()) {
+        return false;
+    }
+    if(!processExecutable(this->imageMagickConvert)) return false;
+
+    this->imageMagickConvert->start(tr("%1/convert %2.eps %2.%3")
+                              .arg(this->pathDvipng)
+                              .arg(this->fileName).arg(this->type));
+
+    if(this->imageMagickConvert->waitForFinished(PROCESS_TIMEOUT)) {
+        QFile::remove(tr("%2.eps").arg(this->fileName));
+        return true;
+    } else {
+        return false;
+    }
+
 }
 
 bool converter::processExecutable(QProcess *process)
@@ -200,7 +219,7 @@ bool converter::processExecutable(QProcess *process)
 
 void converter::subscribePathPlatex(const QString &pathPlatex)
 {
-    this->pathPlatex = pathPlatex;
+    this->pathLatex = pathPlatex;
 }
 
 void converter::subscribePathDvips(const QString &pathDvips)
@@ -222,7 +241,7 @@ void converter::subscribePathImageMagick(const QString &pathImageMagick)
 
 QString converter::getPathPlatex() const
 {
-    return this->pathPlatex;
+    return this->pathLatex;
 }
 
 QString converter::getPathDvips() const
