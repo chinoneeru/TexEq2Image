@@ -1,6 +1,7 @@
 #include "myPlainTextEdit.h"
 #include "blockHighlighter.h"
 #include "mySyntaxHighlighter.h"
+#include "textTreeNode.h"
 #include <QMessageBox>
 #include <iostream>
 
@@ -35,6 +36,23 @@ int myPlainTextEdit::getLastEnteredChar() const
     return this->lastEnteredChar;
 }
 
+void myPlainTextEdit::getHighlightedArea(int *start, int *end)
+{
+    textTreeNode* node = blkHighlighter->highlightedBlock();
+    if(node == 0) {
+        *start = -1;
+        *end = -1;
+    } else {
+        if (node->depth() > 0) {
+            *start = node->start();
+            *end = node->end();
+        } else {
+            *start = -1;
+            *end = -1;
+        }
+    }
+}
+
 void myPlainTextEdit::keyPressEvent(QKeyEvent *event)
 {
     //QMessageBox::about(0, tr(""), tr("%1").arg(this->overwriteMode()));
@@ -44,7 +62,7 @@ void myPlainTextEdit::keyPressEvent(QKeyEvent *event)
     //std::cout << "keyPressEvent" << this->currentCharFormat().fontUnderline() << std::endl;
 
     if (event->modifiers().testFlag(Qt::ControlModifier)) {
-        if(!simpleEmacsEmulator(event)){
+        if(!simpleEmacsEmulator(event) && !specialCommands(event)){
             QPlainTextEdit::keyPressEvent(event);
         }
     } else {
@@ -118,6 +136,20 @@ bool myPlainTextEdit::simpleEmacsEmulator(QKeyEvent *event)
 
 nothingToDo:
     return false;
+}
+
+bool myPlainTextEdit::specialCommands(QKeyEvent *event)
+{
+    bool ret = false;
+
+    switch(event->key()) {
+    case Qt::Key_H:
+        emit highlightedPreviewCommand();
+        ret = true;
+        break;
+    }
+
+    return ret;
 }
 
 /*

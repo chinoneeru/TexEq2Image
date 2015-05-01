@@ -7,6 +7,7 @@
 blockHighlighter::blockHighlighter(QPlainTextEdit* editor) :
     editor(editor),
     txtTree(0),
+    highlightedNode(0),// dummyNode(0),
     textChangedFlag(false),
     brushNormal(QColor(0xff, 0xff, 0xff)),
     brushCorrect(QColor(0xe4, 0xd2, 0xd8)),
@@ -19,11 +20,14 @@ blockHighlighter::blockHighlighter(QPlainTextEdit* editor) :
 
     connect(this->editor, SIGNAL(cursorPositionChanged()),
             this, SLOT(highlight()));
+
+    //dummyNode = new textTreeNode();
 }
 
 blockHighlighter::~blockHighlighter()
 {
     delete txtTree;
+    //delete dummyNode;
 }
 
 void blockHighlighter::highlight()
@@ -39,7 +43,7 @@ void blockHighlighter::highlight()
 
     textTreeNode *node = txtTree->root();
     textTreeNode *nextNode = 0;
-    textTreeNode *highlightedNode = node;
+    highlightedNode = node;
     int maxDepth = 0;
 
     while(node != 0) {
@@ -143,4 +147,9 @@ bool blockHighlighter::isParenthesisMatched(int leftPos, int rightPos, const QSt
     }
 
     return false;
+}
+
+textTreeNode *blockHighlighter::highlightedBlock()
+{
+    return highlightedNode;
 }

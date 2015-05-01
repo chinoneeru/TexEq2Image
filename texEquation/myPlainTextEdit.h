@@ -14,6 +14,7 @@ public:
 
 public slots:
     int getLastEnteredChar() const;
+    void getHighlightedArea(int* start, int* end);
 
 protected slots:
     virtual void keyPressEvent(QKeyEvent *event);
@@ -21,6 +22,7 @@ protected slots:
 private slots:
     void completion(QKeyEvent *event);
     bool simpleEmacsEmulator(QKeyEvent *event);
+    bool specialCommands(QKeyEvent *event);
     //void textEnhanced(bool enhanced);
     //void bracketHighlighter();
     //void bracketHighlighter(bool fragEnhance);
@@ -29,6 +31,7 @@ private slots:
 
 signals:
     void startInputCompletion(char lastInputedChar, QPlainTextEdit *textEdit);
+    void highlightedPreviewCommand();
 
 private:
     QTextCursor cursor;

@@ -54,6 +54,9 @@ MainWindow::MainWindow(QWidget *parent) :
             conv, SLOT(execute()),
             Qt::QueuedConnection);
 
+    connect(ui->plainTextEditEq, SIGNAL(highlightedPreviewCommand()),
+            this, SLOT(createHighlightedPreview()));
+
     timer = new QTimer(this);
     timer->setSingleShot(true);
     connect(timer, SIGNAL(timeout()),
@@ -106,14 +109,33 @@ void MainWindow::enablePreview()
     ui->comboBoxFont->setEnabled(true);
 }
 
-void MainWindow::createPreview()
+void MainWindow::createHighlightedPreview()
 {
-    bool ret = conv->setup(ui->plainTextEditEq->toPlainText(),
+    createPreview(true);
+}
+
+void MainWindow::createPreview(bool highlight)
+{
+    QString text = ui->plainTextEditEq->toPlainText();
+    QStringList _packageList = *packageList;
+
+    if (highlight) {
+        int highlightStart, highlightEnd;
+        ui->plainTextEditEq->getHighlightedArea(&highlightStart, &highlightEnd);
+
+        if (highlightEnd > 0) {
+            _packageList.push_back(tr("color"));
+            text.insert(highlightEnd, tr("}"));
+            text.insert(highlightStart + 1, tr("\\textcolor[named]{MidnightBlue}{"));
+        }
+    }
+
+    bool ret = conv->setup(text,
                 2,
                 ui->comboBoxFont->currentText(),
                 tr("preview"),
                 tr("png"),
-                *(this->packageList),
+                _packageList,
                 *(this->includeList),
                 converter::prev);
 

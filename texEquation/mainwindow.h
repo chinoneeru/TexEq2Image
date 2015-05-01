@@ -28,7 +28,8 @@ private slots:
     void enableConvert();
     void disablePreview();
     void enablePreview();
-    void createPreview();
+    void createPreview(bool highlight = false);
+    void createHighlightedPreview();
     void showPreview();
     void loadIniFile();
     void writeIniFile();

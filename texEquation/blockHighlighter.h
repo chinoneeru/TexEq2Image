@@ -20,6 +20,7 @@ public:
 public slots:
     void highlight();
     void setTextChangedFlag();
+    class textTreeNode* highlightedBlock();
 
 private slots:
     void analyze(const QString &text);
@@ -29,6 +30,8 @@ private:
     //int coursorPos;
     QPlainTextEdit* editor;
     class textTree* txtTree;
+    class textTreeNode* highlightedNode;
+    //class textTreeNode* dummyNode;
     bool textChangedFlag;
     QBrush brushNormal, brushCorrect, brushMiss;
 };
