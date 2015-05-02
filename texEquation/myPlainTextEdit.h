@@ -14,7 +14,7 @@ public:
 
 public slots:
     int getLastEnteredChar() const;
-    void getHighlightedArea(int* start, int* end);
+    bool getHighlightedArea(QString *startToken, int* startTokenPos, QString *endToken, int* endTokenPos);
 
 protected slots:
     virtual void keyPressEvent(QKeyEvent *event);

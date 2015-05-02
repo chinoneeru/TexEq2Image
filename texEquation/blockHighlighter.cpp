@@ -99,7 +99,71 @@ void blockHighlighter::analyze(const QString& text)
     txtTree->clear(text.count());
     textTreeNode* node = txtTree->root();
 
-    for(int i = 0; i < text.count(); i++) {
+    QString patternLeft = tr("%1|%2|%3|%4|%5|%6|%7")
+            .arg("\\\\left[ ]*\\(")
+            .arg("\\\\left[ ]*\\[")
+            .arg("\\\\left[ ]*\\\\\\{")
+            .arg("\\(")
+            .arg("\\[")
+            .arg("\\\\\\{")
+            .arg("\\{")
+            ;
+    QString patternRight = tr("%1|%2|%3|%4|%5|%6|%7")
+            .arg("\\\\right[ ]*\\)")
+            .arg("\\\\right[ ]*\\]")
+            .arg("\\\\right[ ]*\\\\\\}")
+            .arg("\\)")
+            .arg("\\]")
+            .arg("\\\\\\}")
+            .arg("\\}")
+            ;
+
+    QRegExp expressionLeft(patternLeft);
+    QRegExp expressionRight(patternRight);
+
+    int searchStartPos = 0;
+    int tokenLength = 0;
+    int index = 0;
+
+    while(1) {
+        firstParenthesis parenthesis;
+
+        int indexLeft =  text.indexOf(expressionLeft , searchStartPos);
+        int indexRight = text.indexOf(expressionRight, searchStartPos);
+
+        if (indexLeft < 0 && indexRight < 0) {
+            break;
+        } else if (indexLeft < 0) {
+            parenthesis = rightParenthesis;
+        } else if (indexRight < 0) {
+            parenthesis = leftParenthesis;
+        } else {
+            if (indexLeft < indexRight) {
+                parenthesis = leftParenthesis;
+            } else {
+                parenthesis = rightParenthesis;
+            }
+        }
+
+        switch (parenthesis) {
+        case leftParenthesis:
+            tokenLength = expressionLeft.matchedLength();
+            index = indexLeft;
+            node = txtTree->down();
+            node->setStartToken(text.mid(index, tokenLength), index);
+            break;
+        case rightParenthesis:
+            tokenLength = expressionRight.matchedLength();
+            index = indexRight;
+            node->setEndToken(text.mid(index, tokenLength), index);
+            node = txtTree->up();
+            break;
+        }
+
+        searchStartPos = index + tokenLength;
+    }
+
+    /*for(int i = 0; i < text.count(); i++) {
         switch(text.at(i).toLatin1()) {
         case '(':
         case '{':
@@ -114,7 +178,7 @@ void blockHighlighter::analyze(const QString& text)
             node = txtTree->up();
             break;
         }
-    }
+    }*/
 }
 
 void blockHighlighter::setTextChangedFlag()
@@ -147,6 +211,11 @@ bool blockHighlighter::isParenthesisMatched(int leftPos, int rightPos, const QSt
     }
 
     return false;
+}
+
+int blockHighlighter::findParenthesisToken(const QString &text, int startPos)
+{
+    return 0;
 }
 
 textTreeNode *blockHighlighter::highlightedBlock()

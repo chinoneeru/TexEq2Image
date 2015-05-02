@@ -23,8 +23,12 @@ public slots:
     class textTreeNode* highlightedBlock();
 
 private slots:
-    void analyze(const QString &text);
+    void analyze(const QString& text);
     bool isParenthesisMatched(int leftPos, int rightPos, const QString& text);
+    int findParenthesisToken(const QString& text, int startPos);
+
+private:
+    enum firstParenthesis {leftParenthesis, rightParenthesis};
 
 private:
     //int coursorPos;

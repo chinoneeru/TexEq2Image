@@ -37,6 +37,18 @@ textTreeNode* textTreeNode::addChilde()
     return ptr;
 }
 
+void textTreeNode::setStartToken(const QString &token, int pos)
+{
+    _startToken = token;
+    setStart(pos);
+}
+
+void textTreeNode::setEndToken(const QString &token, int pos)
+{
+    _endToken = token;
+    setEnd(pos + _endToken.length() - 1);
+}
+
 void textTreeNode::setStart(int startPos)
 {
     _start = startPos;
@@ -62,6 +74,16 @@ int textTreeNode::end() const
 int textTreeNode::depth() const
 {
     return _depth;
+}
+
+QString textTreeNode::startToken() const
+{
+    return _startToken;
+}
+
+QString textTreeNode::endToken() const
+{
+    return _endToken;
 }
 
 textTreeNode* textTreeNode::parent() const

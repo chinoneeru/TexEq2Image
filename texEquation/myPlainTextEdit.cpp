@@ -36,19 +36,20 @@ int myPlainTextEdit::getLastEnteredChar() const
     return this->lastEnteredChar;
 }
 
-void myPlainTextEdit::getHighlightedArea(int *start, int *end)
+bool myPlainTextEdit::getHighlightedArea(QString* startToken, int* startTokenPos, QString* endToken, int* endTokenPos)
 {
     textTreeNode* node = blkHighlighter->highlightedBlock();
     if(node == 0) {
-        *start = -1;
-        *end = -1;
+        return false;
     } else {
         if (node->depth() > 0) {
-            *start = node->start();
-            *end = node->end();
+            *startToken = node->startToken();
+            *endToken   = node->endToken();
+            *startTokenPos = node->start();
+            *endTokenPos   = node->end() - node->endToken().length() + 1;
+            return true;
         } else {
-            *start = -1;
-            *end = -1;
+            return false;
         }
     }
 }

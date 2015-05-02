@@ -11,6 +11,7 @@
 #include <QTimer>
 #include <QStringList>
 #include "mySyntaxHighlighter.h"
+#include <iostream>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -120,13 +121,15 @@ void MainWindow::createPreview(bool highlight)
     QStringList _packageList = *packageList;
 
     if (highlight) {
-        int highlightStart, highlightEnd;
-        ui->plainTextEditEq->getHighlightedArea(&highlightStart, &highlightEnd);
+        QString highlightStartToken, highlightEndToken;
+        int highlightStartTokenPos, highlightEndTokenPos;
+        bool isHighlighted = ui->plainTextEditEq->getHighlightedArea(&highlightStartToken, &highlightStartTokenPos,
+                                                                     &highlightEndToken, &highlightEndTokenPos);
 
-        if (highlightEnd > 0) {
+        if (isHighlighted) {
             _packageList.push_back(tr("color"));
-            text.insert(highlightEnd, tr("}"));
-            text.insert(highlightStart + 1, tr("\\textcolor[named]{MidnightBlue}{"));
+            text.insert(highlightEndTokenPos , tr("}"));
+            text.insert(highlightStartTokenPos + highlightStartToken.length(), tr("\\textcolor[named]{MidnightBlue}{"));
         }
     }
 
