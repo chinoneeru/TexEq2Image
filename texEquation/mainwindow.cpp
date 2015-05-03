@@ -129,7 +129,7 @@ void MainWindow::createPreview(bool highlight)
         if (isHighlighted) {
             _packageList.push_back(tr("color"));
             text.insert(highlightEndTokenPos , tr("}"));
-            text.insert(highlightStartTokenPos + highlightStartToken.length(), tr("\\textcolor[named]{MidnightBlue}{"));
+            text.insert(highlightStartTokenPos + highlightStartToken.length(), tr("\\textcolor[named]{Orchid}{"));
         }
     }
 

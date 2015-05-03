@@ -78,7 +78,7 @@ void blockHighlighter::highlight()
         }
     } else {
         if (highlightedNode->blockClosed() &&
-                isParenthesisMatched(highlightedNode->start(), highlightedNode->end(), text)
+                isParenthesisMatched(*highlightedNode)
                 ) {
             selection.format.setBackground(brushCorrect);
         } else {
@@ -99,19 +99,23 @@ void blockHighlighter::analyze(const QString& text)
     txtTree->clear(text.count());
     textTreeNode* node = txtTree->root();
 
-    QString patternLeft = tr("%1|%2|%3|%4|%5|%6|%7")
+    QString patternLeft = tr("%1|%2|%3|%4|%5|%6|%7|%8|%9")
             .arg("\\\\left[ ]*\\(")
             .arg("\\\\left[ ]*\\[")
             .arg("\\\\left[ ]*\\\\\\{")
+            .arg("\\\\left[ ]*\\.")
+            .arg("\\\\left[ ]*\\|")
             .arg("\\(")
             .arg("\\[")
             .arg("\\\\\\{")
             .arg("\\{")
             ;
-    QString patternRight = tr("%1|%2|%3|%4|%5|%6|%7")
+    QString patternRight = tr("%1|%2|%3|%4|%5|%6|%7|%8|%9")
             .arg("\\\\right[ ]*\\)")
             .arg("\\\\right[ ]*\\]")
             .arg("\\\\right[ ]*\\\\\\}")
+            .arg("\\\\right[ ]*\\.")
+            .arg("\\\\right[ ]*\\|")
             .arg("\\)")
             .arg("\\]")
             .arg("\\\\\\}")
@@ -162,23 +166,6 @@ void blockHighlighter::analyze(const QString& text)
 
         searchStartPos = index + tokenLength;
     }
-
-    /*for(int i = 0; i < text.count(); i++) {
-        switch(text.at(i).toLatin1()) {
-        case '(':
-        case '{':
-        case '[':
-            node = txtTree->down();
-            node->setStart(i);
-            break;
-        case ')':
-        case '}':
-        case ']':
-            node->setEnd(i);
-            node = txtTree->up();
-            break;
-        }
-    }*/
 }
 
 void blockHighlighter::setTextChangedFlag()
@@ -187,30 +174,26 @@ void blockHighlighter::setTextChangedFlag()
     highlight();
 }
 
-bool blockHighlighter::isParenthesisMatched(int leftPos, int rightPos, const QString& text)
+bool blockHighlighter::isParenthesisMatched(const textTreeNode& highlightedNode)
 {
-    char l = text.at(leftPos).toLatin1();
-    char r = text.at(rightPos).toLatin1();
+    bool ret = true;
 
-    //std::cout << "l = " << l << std::endl;
-    //std::cout << "r = " << r << std::endl;
+    //std::cout << highlightedNode.startToken().toLatin1().data() << std::endl;
+    //std::cout << highlightedNode.endToken().toLatin1().data() << std::endl;
 
-    switch(l) {
-    case '(':
-        if (r == ')') return true;
-        break;
-    case '{':
-        if (r == '}') return true;
-        break;
-    case '[':
-        if (r == ']') return true;
-        break;
-    default:
-        return true;
-        break;
+    if (highlightedNode.startToken() == "{") {
+        ret = false;
+        if (highlightedNode.endToken() == "}") {
+            ret = true;
+        }
+    } else if (highlightedNode.startToken().contains("\\left")) {
+        ret = false;
+        if (highlightedNode.endToken().contains("\\right")) {
+            ret = true;
+        }
     }
 
-    return false;
+    return ret;
 }
 
 int blockHighlighter::findParenthesisToken(const QString &text, int startPos)

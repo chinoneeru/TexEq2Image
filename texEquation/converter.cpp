@@ -226,7 +226,7 @@ void converter::subscribePathDvips(const QString &pathDvips)
 {
     this->pathDvips = pathDvips;
 
-    subscribePathDvipng(pathDvips);
+    //subscribePathDvipng(pathDvips);
 }
 
 void converter::subscribePathDvipng(const QString &pathDvipng)

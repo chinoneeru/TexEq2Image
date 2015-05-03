@@ -18,7 +18,14 @@ mySyntaxHighlighter::~mySyntaxHighlighter()
 
 void mySyntaxHighlighter::highlightBlock(const QString &text)
 {
-    QString pattern = "\\\\[A-Za-z]+|\\(|\\)|\\{|\\}|\\[|\\]";
+    QString pattern = tr("%1|%2|%3|%4|%5|%6|%7")
+            .arg("\\\\[A-Za-z]*")
+            .arg("\\(")
+            .arg("\\)")
+            .arg("\\{")
+            .arg("\\}")
+            .arg("\\[")
+            .arg("\\]");
 
     QRegExp expression(pattern);
     int index = text.indexOf(expression);
@@ -28,7 +35,7 @@ void mySyntaxHighlighter::highlightBlock(const QString &text)
         index = text.indexOf(expression, index + length);
     }
 
-    pattern = "[0-9]+";
+    pattern = "[0-9]+\\.{0,1}[0-9]*";
     expression.setPattern(pattern);
     index = text.indexOf(expression);
     while (index >= 0) {

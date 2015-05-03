@@ -24,7 +24,7 @@ public slots:
 
 private slots:
     void analyze(const QString& text);
-    bool isParenthesisMatched(int leftPos, int rightPos, const QString& text);
+    bool isParenthesisMatched(const class textTreeNode& highlightedNode);
     int findParenthesisToken(const QString& text, int startPos);
 
 private:
