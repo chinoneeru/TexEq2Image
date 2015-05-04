@@ -10,8 +10,10 @@ blockHighlighter::blockHighlighter(QPlainTextEdit* editor) :
     highlightedNode(0),// dummyNode(0),
     textChangedFlag(false),
     brushNormal(QColor(0xff, 0xff, 0xff)),
-    brushCorrect(QColor(0xe4, 0xd2, 0xd8)),
-    brushMiss(QColor(0xf5, 0xb1, 0xaa))
+    brushCorrectInside(QColor(0xe7, 0xe7, 0xeb)),
+    brushCorrectSides(QColor(0xc8, 0xc2, 0xc6)),
+    brushMissInside(QColor(0xf5, 0xb1, 0xaa)),
+    brushMissSides(QColor(0xee, 0x82, 0x7c))
 {
     txtTree = new textTree();
 
@@ -64,33 +66,67 @@ void blockHighlighter::highlight()
     }
 
     QList<QTextEdit::ExtraSelection> selections;
-    QTextEdit::ExtraSelection selection;
-    QTextCursor cursor = editor->textCursor();
+    QTextEdit::ExtraSelection selection0, selection1, selection2;
+    QTextCursor cursor0 = editor->textCursor();
+    QTextCursor cursor1 = editor->textCursor();
+    QTextCursor cursor2 = editor->textCursor();
 
     if (highlightedNode->depth() == 0) { /*root-block*/
         if (highlightedNode->blockClosed()) { /*root-block cannot be closed if no mistake occures.*/
-            selection.format.setBackground(brushMiss);
-            cursor.setPosition(highlightedNode->start());
-            cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor,
-                                highlightedNode->end() - highlightedNode->start() + 1);
+
+            selection0.format.setBackground(brushMissSides);
+            selection1.format.setBackground(brushMissInside);
+            selection2.format.setBackground(brushMissSides);
+
         } else {
-            selection.format.setBackground(brushNormal);
+
+            selection0.format.setBackground(brushNormal);
+            selection1.format.setBackground(brushNormal);
+            selection2.format.setBackground(brushNormal);
+
+            goto finish;
+
         }
     } else {
         if (highlightedNode->blockClosed() &&
                 isParenthesisMatched(*highlightedNode)
                 ) {
-            selection.format.setBackground(brushCorrect);
+
+            selection0.format.setBackground(brushCorrectSides);
+            selection1.format.setBackground(brushCorrectInside);
+            selection2.format.setBackground(brushCorrectSides);
+
         } else {
-            selection.format.setBackground(brushMiss);
+
+            selection0.format.setBackground(brushMissSides);
+            selection1.format.setBackground(brushMissInside);
+            selection2.format.setBackground(brushMissSides);
+
         }
-        cursor.setPosition(highlightedNode->start());
-        cursor.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor,
-                            highlightedNode->end() - highlightedNode->start() + 1);
+
     }
 
-    selection.cursor = cursor;
-    selections.append(selection);
+    cursor0.setPosition(highlightedNode->start());
+    cursor0.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor,
+                        highlightedNode->startToken().length());
+    cursor1.setPosition(highlightedNode->start() + highlightedNode->startToken().length());
+    cursor1.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor,
+                         highlightedNode->end() - highlightedNode->start() + 1
+                         - highlightedNode->startToken().length() - highlightedNode->endToken().length());
+    cursor2.setPosition(highlightedNode->end() - highlightedNode->endToken().length() + 1);
+    cursor2.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor,
+                        highlightedNode->endToken().length());
+
+finish:
+
+    selection0.cursor = cursor0;
+    selection1.cursor = cursor1;
+    selection2.cursor = cursor2;
+
+    selections.append(selection0);
+    selections.append(selection1);
+    selections.append(selection2);
+
     editor->setExtraSelections(selections);
 }
 
@@ -99,25 +135,25 @@ void blockHighlighter::analyze(const QString& text)
     txtTree->clear(text.count());
     textTreeNode* node = txtTree->root();
 
-    QString patternLeft = tr("%1|%2|%3|%4|%5|%6|%7|%8|%9")
+    QString patternLeft = tr("%1|%2|%3|%4|%5|%6|%7")
             .arg("\\\\left[ ]*\\(")
             .arg("\\\\left[ ]*\\[")
             .arg("\\\\left[ ]*\\\\\\{")
             .arg("\\\\left[ ]*\\.")
             .arg("\\\\left[ ]*\\|")
-            .arg("\\(")
-            .arg("\\[")
+            //.arg("\\(")
+            //.arg("\\[")
             .arg("\\\\\\{")
             .arg("\\{")
             ;
-    QString patternRight = tr("%1|%2|%3|%4|%5|%6|%7|%8|%9")
+    QString patternRight = tr("%1|%2|%3|%4|%5|%6|%7")
             .arg("\\\\right[ ]*\\)")
             .arg("\\\\right[ ]*\\]")
             .arg("\\\\right[ ]*\\\\\\}")
             .arg("\\\\right[ ]*\\.")
             .arg("\\\\right[ ]*\\|")
-            .arg("\\)")
-            .arg("\\]")
+            //.arg("\\)")
+            //.arg("\\]")
             .arg("\\\\\\}")
             .arg("\\}")
             ;
@@ -153,14 +189,18 @@ void blockHighlighter::analyze(const QString& text)
         case leftParenthesis:
             tokenLength = expressionLeft.matchedLength();
             index = indexLeft;
-            node = txtTree->down();
-            node->setStartToken(text.mid(index, tokenLength), index);
+            if (text.mid(index, tokenLength) != "\\{") {
+                node = txtTree->down();
+                node->setStartToken(text.mid(index, tokenLength), index);
+            }
             break;
         case rightParenthesis:
             tokenLength = expressionRight.matchedLength();
             index = indexRight;
-            node->setEndToken(text.mid(index, tokenLength), index);
-            node = txtTree->up();
+            if (text.mid(index, tokenLength) != "\\}") {
+                node->setEndToken(text.mid(index, tokenLength), index);
+                node = txtTree->up();
+            }
             break;
         }
 

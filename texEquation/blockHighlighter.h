@@ -37,7 +37,7 @@ private:
     class textTreeNode* highlightedNode;
     //class textTreeNode* dummyNode;
     bool textChangedFlag;
-    QBrush brushNormal, brushCorrect, brushMiss;
+    QBrush brushNormal, brushCorrectInside, brushCorrectSides, brushMissInside, brushMissSides;
 };
 
 #endif // BLOCKHIGHLIGHTER_H
