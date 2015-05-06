@@ -129,15 +129,20 @@ void MainWindow::createPreview(bool highlight)
         if (isHighlighted) {
             _packageList.push_back(tr("color"));
             if (highlightEndToken == "}") {
-                text.insert(highlightEndTokenPos
-                            ,tr("}"));
-                text.insert(highlightStartTokenPos + highlightStartToken.length()
-                            ,tr("\\textcolor[named]{Orchid}{"));
+                text.insert(highlightEndTokenPos,
+                             tr("}"));
+                text.insert(highlightStartTokenPos + highlightStartToken.length(),
+                            tr("\\textcolor[named]{Orchid}{"));
+            } else if (highlightEndToken.length() == 0) {
+                text.insert(highlightEndTokenPos,
+                            tr("}"));
+                text.insert(highlightStartTokenPos,
+                            tr("\\textcolor[named]{Orchid}{"));
             } else {
-                text.insert(highlightEndTokenPos
-                            ,tr("}"));
-                text.insert(highlightStartTokenPos
-                            ,tr("\\textcolor[named]{Orchid}{"));
+                text.insert(highlightEndTokenPos + highlightEndToken.length(),
+                            tr("}"));
+                text.insert(highlightStartTokenPos,
+                            tr("\\textcolor[named]{Orchid}{"));
             }
         }
     }
