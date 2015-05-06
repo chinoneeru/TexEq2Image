@@ -1,0 +1,17 @@
+#include "textTreeNodeBlockWithOneBlock.h"
+
+textTreeNodeBlockWithOneBlock::textTreeNodeBlockWithOneBlock(textTreeNode *parent, int start, int end)
+    :textTreeNode(parent, start, end)
+{
+    //QString pattern = 
+}
+
+textTreeNodeBlockWithOneBlock::~textTreeNodeBlockWithOneBlock()
+{
+    
+}
+
+bool textTreeNodeBlockWithOneBlock::isClosingCondition()
+{
+    if (children.)
+}

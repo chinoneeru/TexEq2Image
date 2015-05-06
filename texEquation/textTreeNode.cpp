@@ -5,6 +5,8 @@ textTreeNode::textTreeNode(textTreeNode *parent, int start, int end) :
     _parent(parent),
     _start(start),
     _end(end),
+    _startToken(""),
+    _endToken(""),
     focusedChilde(0),
     _blockClosed(false)
 {
@@ -32,9 +34,16 @@ textTreeNode::~textTreeNode()
 
 textTreeNode* textTreeNode::addChilde()
 {
-    textTreeNode* ptr = new textTreeNode(this);
-    children.push_back(ptr);
-    return ptr;
+    //textTreeNode* ptr = new textTreeNode(this);
+    //children.push_back(ptr);
+    //return ptr;
+    return 0;
+}
+
+textTreeNode* textTreeNode::addChilde(textTreeNode *newNode)
+{
+    children.push_back(newNode);
+    return newNode;
 }
 
 void textTreeNode::setStartToken(const QString &token, int pos)
@@ -46,19 +55,29 @@ void textTreeNode::setStartToken(const QString &token, int pos)
 void textTreeNode::setEndToken(const QString &token, int pos)
 {
     _endToken = token;
-    setEnd(pos + _endToken.length() - 1);
+    setEnd(pos);
 }
 
 void textTreeNode::setStart(int startPos)
 {
     _start = startPos;
+    //std::cout << "startToken: " << _startToken.toLatin1().data() << std::endl;
+    //std::cout << "startPos  : " << (int)(_start) << std::endl;
 }
 
 void textTreeNode::setEnd(int endPos)
 {
     _end = endPos;
+    //std::cout << "endToken: " << _endToken.toLatin1().data() << std::endl;
+    //std::cout << "endPos  : " << (int)(_end) << std::endl;
 
     _blockClosed = true;
+}
+
+void textTreeNode::setTokenToBeChecked(const QString &token/*, int pos*/)
+{
+    _tokenToBeChecked = token;
+    //posOfTokenToBeChecked = pos;
 }
 
 int textTreeNode::start() const

@@ -46,7 +46,7 @@ bool myPlainTextEdit::getHighlightedArea(QString* startToken, int* startTokenPos
             *startToken = node->startToken();
             *endToken   = node->endToken();
             *startTokenPos = node->start();
-            *endTokenPos   = node->end() - node->endToken().length() + 1;
+            *endTokenPos   = node->end();
             return true;
         } else {
             return false;

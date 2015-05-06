@@ -1,0 +1,20 @@
+#ifndef TEXTTREENODEBLOCKWITHONEBLOCK_H
+#define TEXTTREENODEBLOCKWITHONEBLOCK_H
+
+#include "textTreeNode.h"
+
+class textTreeNodeBlockWithOneBlock : public textTreeNode {
+    
+public:
+    textTreeNodeBlockWithOneBlock(class textTreeNode* parent = 0, int start = 0, int end = 0);
+    ~textTreeNodeBlockWithOneBlock();
+    
+public:
+    bool isClosingCondition();
+    
+private:
+    //QRegExp closeTokenExpression;
+    
+};
+
+#endif // TEXTTREENODEBLOCKWITHONEBLOCK_H

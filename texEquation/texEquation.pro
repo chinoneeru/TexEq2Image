@@ -20,7 +20,11 @@ SOURCES += main.cpp\
     mySyntaxHighlighter.cpp \
     textTree.cpp \
     textTreeNode.cpp \
-    blockHighlighter.cpp
+    blockHighlighter.cpp \
+    textTreeNodeBlockWithBlackets.cpp \
+    textTreeNodeBlockWithLeftRight.cpp \
+    textTreeNodeBlockWithBlocks.cpp \
+    textTreeNodeRoot.cpp
 
 HEADERS  += mainwindow.h \
     converter.h \
@@ -29,7 +33,11 @@ HEADERS  += mainwindow.h \
     mySyntaxHighlighter.h \
     textTree.h \
     textTreeNode.h \
-    blockHighlighter.h
+    blockHighlighter.h \
+    textTreeNodeBlockWithBlackets.h \
+    textTreeNodeBlockWithLeftRight.h \
+    textTreeNodeBlockWithBlocks.h \
+    textTreeNodeRoot.h
 
 FORMS    += mainwindow.ui \
     importform.ui

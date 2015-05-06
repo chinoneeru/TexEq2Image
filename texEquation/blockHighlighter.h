@@ -19,13 +19,11 @@ public:
 
 public slots:
     void highlight();
-    void setTextChangedFlag();
     class textTreeNode* highlightedBlock();
 
 private slots:
     void analyze(const QString& text);
-    bool isParenthesisMatched(const class textTreeNode& highlightedNode);
-    int findParenthesisToken(const QString& text, int startPos);
+    bool wasTextChanged(const QString& text);
 
 private:
     enum firstParenthesis {leftParenthesis, rightParenthesis};
