@@ -45,7 +45,7 @@ void blockHighlighter::highlight()
 
     while(node != 0) {
 
-        if (node->start() <= coursorPos && coursorPos <= node->end()) {
+        if (node->start() <= coursorPos && coursorPos < node->end() + node->endToken().length()) {
             if(node->depth() > maxDepth) {
                 highlightedNode = node;
                 maxDepth = node->depth();
